@@ -4,11 +4,8 @@ import networkx as nx
 import random
 import math
 from colorama import Fore, Back, Style, init
-from flask_frozen import Freezer
 
 app = Flask(__name__)
-
-freezer = Freezer(app)
 
 init()  # Para Colorama
 
@@ -228,9 +225,6 @@ def generate_text():
         return jsonify({'response': [{'text': 'Perdón no se como responder.', 'color': 'error'}]})
     else:
         return jsonify({'response': Continuator})
-
-if __name__ == '__main__':
-    freezer.freeze()  # Generates HTML files in a "build" folder
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
