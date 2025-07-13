@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Texto - Continuator</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+        
+        .chat-container {
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #555;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .user-message {
+            background-color: #333;
+            text-align: right;
+        }
+        
+        .bot-message {
+            background-color: #333;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #2d2d2d;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        #sendButton {
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        #sendButton:hover {
+            background-color: #45a049;
+        }
+        
+        #sendButton:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .qn {
+            background-color: #0066cc;
+            color: white;
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
+        
+        .uno {
+            background-color: #cc0000;
+            color: white;
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
+        
+        .dos {
+            background-color: #00cc00;
+            color: white;
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
+        
+        .input {
+            color: #ffffff;
+        }
+        
+        .error {
+            color: #ff6666;
+        }
+        
+        .loading {
+            opacity: 0.7;
+        }
+        
+        .instructions {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generador de Texto - Continuator</h1>
+        
+        <div class="instructions">
+            <p><strong>Instrucciones:</strong> Escribe un texto y el sistema lo continuará usando un algoritmo para encontrar un quasi-núcleo en una digrafica.</p>
+            <p><strong>Colores:</strong> Las palabras están coloreadas según su cercanía al quasi-núcleo: <p>
+                <span class="qn">Azul=Quasi-núcleo</span>, 
+                <span class="uno">Rojo=1-Absorbente</span>, 
+                <span class="dos">Verde=2-Absorbente</span>.
+            </p>
+        </div>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message bot-message">
+                <strong>Continuator:</strong> ¡Hola! Escribe un texto para que pueda continuarlo.
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Escribe tu texto aquí..." maxlength="500">
+            <button id="sendButton" onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            if (isUser) {
+                messageDiv.innerHTML = `<strong>Usuario:</strong> ${content}`;
+            } else {
+                messageDiv.innerHTML = `<strong>Continuator:</strong> ${content}`;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function formatResponse(response) {
+            return response.map(item => {
+                if (item.color && item.color !== 'input') {
+                    return `<span class="${item.color}">${item.text}</span>`;
+                }
+                return item.text;
+            }).join('');
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            
+            if (!text) {
+                return;
+            }
+            
+            // Add user message
+            addMessage(text, true);
+            
+            // Clear input and disable button
+            userInput.value = '';
+            sendButton.disabled = true;
+            sendButton.textContent = 'Generando...';
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                const data = await response.json();
+                
+                if (data.response) {
+                    const formattedResponse = formatResponse(data.response);
+                    addMessage(formattedResponse);
+                } else {
+                    addMessage('Error al generar respuesta.');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Error de conexión. Por favor intenta de nuevo.');
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = 'Enviar';
+                userInput.focus();
+            }
+        }
+
+        // Allow Enter key to send message
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !sendButton.disabled) {
+                sendMessage();
+            }
+        });
+
+        // Focus on input when page loads
+        userInput.focus();
+    </script>
+</body>
+</html>
