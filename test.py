@@ -1,34 +1,15 @@
 
 from flask import Flask, render_template, request, jsonify
 import networkx as nx
-import random
-import math
 from colorama import Fore, Back, Style, init
 
 app = Flask(__name__)
 
 init()  # Para Colorama
 
-Semilla = random.seed(37)  # Para reproducir ejemplos
-
 ############################################################################
 # Funciones para hacer la digráfica mas estética y ejemplificar la generación de texto
 ############################################################################
-
-def calculate_positions(G, QN, UnoAbs, DosAbs):
-    positions = {}
-    num_nodes = len(G.nodes)
-    for i, node in enumerate(G.nodes):
-        if node in QN:
-            theta = (num_nodes / (2 * math.pi)) + (i / (2 * math.pi))
-            positions[node] = (3 * math.cos(theta), 3 * math.sin(theta))
-        elif node in UnoAbs:
-            theta = (num_nodes / (2 * math.pi)) + (i / (2 * math.pi))
-            positions[node] = (2 * math.cos(theta), 2 * math.sin(theta))
-        elif node in DosAbs:
-            theta = (num_nodes / (2 * math.pi)) + (i / (2 * math.pi))
-            positions[node] = (math.cos(theta), math.sin(theta))
-    return positions
 
 def Color(texto):
     color = ''
