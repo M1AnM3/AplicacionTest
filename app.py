@@ -1,6 +1,7 @@
 
 from flask import Flask, render_template, request, jsonify
 import networkx as nx
+import random
 from colorama import Fore, Back, Style, init
 
 app = Flask(__name__)
