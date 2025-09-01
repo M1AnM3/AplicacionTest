@@ -161,6 +161,8 @@ A = [
     "Los diagramas conmutativos permiten visualizar condiciones en categorías.",
     "La teoría de categorías proporciona un lenguaje unificador para muchas ramas de las matemáticas.",
     "Muchos conceptos algebraicos pueden reformularse categóricamente, como los grupos, anillos y módulos."
+    "tiren paro"
+    "paro muchos conceptos algebraicos pueden reformularse categóricamente, como los grupos, anillos y módulos."
 ]  # Esto es básicamente la base de datos.
 
 G = DiGraCo(A)
