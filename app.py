@@ -162,7 +162,7 @@ A = [
     "La teoría de categorías proporciona un lenguaje unificador para muchas ramas de las matemáticas.",
     "Muchos conceptos algebraicos pueden reformularse categóricamente, como los grupos, anillos y módulos.",
     "tiren paro",
-    "paro muchos conceptos algebraicos pueden reformularse categóricamente, como los grupos, anillos y módulos.",
+    "paro el tren",
 ]  # Esto es básicamente la base de datos.
 
 G = DiGraCo(A)
